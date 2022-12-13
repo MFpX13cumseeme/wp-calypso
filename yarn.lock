@@ -33742,6 +33742,7 @@ fsevents@^1.2.7:
     react-dom: ^17.0.2
     react-intersection-observer: ^9.4.3
     react-modal: ^3.14.3
+    react-select: ^5.4.0
     readline-sync: ^1.4.10
     reakit-utils: ^0.15.1
     recursive-copy: ^2.0.14
