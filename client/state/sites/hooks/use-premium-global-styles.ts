@@ -1,5 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
 import { select } from '@wordpress/data';
-import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { ONBOARD_STORE } from 'calypso/landing/stepper/stores';
 import { getSite } from 'calypso/state/sites/selectors';
