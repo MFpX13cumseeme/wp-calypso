@@ -1,11 +1,12 @@
 import {
 	isWpComFreePlan,
 	isWpcomEnterpriseGridPlan,
-	PLAN_BIENNIAL_PERIOD,
-	PLAN_ANNUAL_PERIOD,
 	PlanSlug,
 	getPlanSlugForTermVariant,
 	TERM_ANNUALLY,
+	TERM_BIENNIALLY,
+	planMatches,
+	TERM_TRIENNIALLY,
 } from '@automattic/calypso-products';
 import { formatCurrency } from '@automattic/format-currency';
 import { localize, TranslateResult, useTranslate } from 'i18n-calypso';
@@ -17,15 +18,10 @@ import { getCurrentUserCurrencyCode } from 'calypso/state/currency-code/selector
 interface Props {
 	planName: string;
 	billingTimeframe: TranslateResult;
-	billingPeriod: number | null | undefined;
 	isMonthlyPlan: boolean;
 }
 
-function usePerMonthDescription( {
-	isMonthlyPlan,
-	planName,
-	billingPeriod,
-}: Omit< Props, 'billingTimeframe' > ) {
+function usePerMonthDescription( { isMonthlyPlan, planName }: Omit< Props, 'billingTimeframe' > ) {
 	const translate = useTranslate();
 	const currencyCode = useSelector( getCurrentUserCurrencyCode );
 	const planPrices = usePlanPrices( {
@@ -66,21 +62,23 @@ function usePerMonthDescription( {
 				? formatCurrency( maybeDiscountedPrice, currencyCode )
 				: null;
 
-		if ( fullTermPriceText ) {
-			if ( PLAN_ANNUAL_PERIOD === billingPeriod ) {
-				return translate( 'per month, %(fullTermPriceText)s billed annually', {
-					args: { fullTermPriceText },
-				} );
-			}
-
-			if ( PLAN_BIENNIAL_PERIOD === billingPeriod ) {
-				return translate( 'per month, %(fullTermPriceText)s billed every two years', {
-					args: { fullTermPriceText },
-				} );
-			}
+		if ( planMatches( planName, { term: TERM_ANNUALLY } ) ) {
+			return translate( 'per month, %(fullTermPriceText)s billed annually', {
+				args: { fullTermPriceText },
+			} );
 		}
 
-		return null;
+		if ( planMatches( planName, { term: TERM_BIENNIALLY } ) ) {
+			return translate( 'per month, %(fullTermPriceText)s billed every two years', {
+				args: { fullTermPriceText },
+			} );
+		}
+
+		if ( planMatches( planName, { term: TERM_TRIENNIALLY } ) ) {
+			return translate( 'per month, %(fullTermPriceText)s billed every three years', {
+				args: { fullTermPriceText },
+			} );
+		}
 	}
 
 	return null;

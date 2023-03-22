@@ -527,7 +527,7 @@ export class PlanFeatures2023Grid extends Component<
 
 	renderBillingTimeframe( planPropertiesObj: PlanProperties[], options?: PlanRowOptions ) {
 		return planPropertiesObj.map( ( properties ) => {
-			const { planConstantObj, planName, isMonthlyPlan, billingPeriod } = properties;
+			const { planConstantObj, planName, isMonthlyPlan } = properties;
 
 			const classes = classNames(
 				'plan-features-2023-grid__table-item',
@@ -540,7 +540,6 @@ export class PlanFeatures2023Grid extends Component<
 						isMonthlyPlan={ isMonthlyPlan }
 						planName={ planName }
 						billingTimeframe={ planConstantObj.getBillingTimeFrame() }
-						billingPeriod={ billingPeriod }
 					/>
 				</Container>
 			);
@@ -997,7 +996,6 @@ const ConnectedPlanFeatures2023Grid = connect(
 			const planConstantObj = applyTestFiltersToPlansList( plan, undefined );
 			const planProductId = planConstantObj.getProductId();
 			const planObject = getPlan( state, planProductId );
-			const billingPeriod = planObject?.bill_period;
 			const isMonthlyPlan = isMonthly( plan );
 			const showMonthly = ! isMonthlyPlan;
 			const relatedMonthlyPlan = showMonthly
@@ -1092,7 +1090,6 @@ const ConnectedPlanFeatures2023Grid = connect(
 				isMonthlyPlan,
 				tagline,
 				storageOptions,
-				billingPeriod,
 				showMonthlyPrice,
 			};
 		} );
