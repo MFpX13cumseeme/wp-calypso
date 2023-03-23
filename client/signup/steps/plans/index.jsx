@@ -2,8 +2,9 @@ import { is2023PricingGridActivePage, getPlan, PLAN_FREE } from '@automattic/cal
 import { Button } from '@automattic/components';
 import { isHostingLPFlow, isSiteAssemblerFlow, isTailoredSignupFlow } from '@automattic/onboarding';
 import { isDesktop, subscribeIsDesktop } from '@automattic/viewport';
+import { withSelect } from '@wordpress/data';
 import classNames from 'classnames';
-import i18n, { localize } from 'i18n-calypso';
+import i18n, { localize, getLocaleSlug } from 'i18n-calypso';
 import PropTypes from 'prop-types';
 import { parse as parseQs } from 'qs';
 import { Component } from 'react';
@@ -31,6 +32,7 @@ import hasInitializedSites from 'calypso/state/selectors/has-initialized-sites';
 import { saveSignupStep, submitSignupStep } from 'calypso/state/signup/progress/actions';
 import { getSiteType } from 'calypso/state/signup/steps/site-type/selectors';
 import { getSiteBySlug } from 'calypso/state/sites/selectors';
+import { PLANS_STORE } from './store';
 import { getDomainName, getIntervalType } from './util';
 import './style.scss';
 
@@ -366,7 +368,7 @@ export const isDotBlogDomainRegistration = ( domainItem ) => {
 	return is_domain_registration && getTld( meta ) === 'blog';
 };
 
-export default connect(
+const ConnectedPlansStep = connect(
 	(
 		state,
 		{ path, signupDependencies: { siteSlug, domainItem, plans_reorder_abtest_variation } }
@@ -394,3 +396,14 @@ export default connect(
 	} ),
 	{ recordTracksEvent, saveSignupStep, submitSignupStep, errorNotice }
 )( localize( PlansStep ) );
+
+// This is a temporary workaround to force the data-store to fetch the plans data
+// before the component is rendered. It should be removed once plans are retrieved
+// via a data-store selector.
+export default withSelect( ( select, ownProps ) => {
+	const locale = getLocaleSlug();
+
+	select( PLANS_STORE ).getSupportedPlans( locale );
+
+	return ownProps;
+} )( ConnectedPlansStep );

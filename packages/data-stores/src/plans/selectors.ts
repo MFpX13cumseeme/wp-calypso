@@ -56,6 +56,24 @@ export const getPlanProductById = (
 		.find( ( product: PlanProduct ) => product.productId === productId );
 };
 
+export const getPlanProductByStoreSlug = (
+	_state: State,
+	planSlug: string | undefined,
+	locale: string
+): PlanProduct | undefined => {
+	if ( ! planSlug ) {
+		return undefined;
+	}
+
+	// This is a temporary workaround / sanity-fallback to ensure plans data
+	// are fetched when the selector is called. It should be refactored and removed.
+	select( STORE_KEY ).getSupportedPlans( locale );
+
+	return ( select( STORE_KEY ) as PlansSelect )
+		.getPlansProducts()
+		.find( ( product: PlanProduct ) => product.storeSlug === planSlug );
+};
+
 export const getPlanByPeriodAgnosticSlug = (
 	_state: State,
 	slug: PlanSlug | undefined,

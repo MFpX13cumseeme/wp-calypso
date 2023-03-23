@@ -13,9 +13,9 @@ import {
 import { is2023PricingGridActivePage } from '@automattic/calypso-products/src/plans-utilities';
 import { WpcomPlansUI } from '@automattic/data-stores';
 import { withShoppingCart } from '@automattic/shopping-cart';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { localize, useTranslate } from 'i18n-calypso';
+import { localize, useTranslate, getLocaleSlug } from 'i18n-calypso';
 import page from 'page';
 import PropTypes from 'prop-types';
 import { Component } from 'react';
@@ -54,6 +54,7 @@ import DomainUpsellDialog from './components/domain-upsell-dialog';
 import PlansHeader from './components/plans-header';
 import ECommerceTrialPlansPage from './ecommerce-trial';
 import ModernizedLayout from './modernized-layout';
+import { PLANS_STORE } from './store';
 import WooExpressPlansPage from './woo-express-plans-page';
 
 import './style.scss';
@@ -473,10 +474,21 @@ const ConnectedPlans = connect( ( state, props ) => {
 	};
 } )( withCartKey( withShoppingCart( localize( withTrackingTool( 'HotJar' )( Plans ) ) ) ) );
 
-export default function PlansWrapper( props ) {
+function PlansWrapper( props ) {
 	return (
 		<CalypsoShoppingCartProvider>
 			<ConnectedPlans { ...props } />
 		</CalypsoShoppingCartProvider>
 	);
 }
+
+// This is a temporary workaround to force the data-store to fetch the plans data
+// before the component is rendered. It should be removed once plans are retrieved
+// via a data-store selector.
+export default withSelect( ( select, ownProps ) => {
+	const locale = getLocaleSlug();
+
+	select( PLANS_STORE ).getSupportedPlans( locale );
+
+	return ownProps;
+} )( PlansWrapper );

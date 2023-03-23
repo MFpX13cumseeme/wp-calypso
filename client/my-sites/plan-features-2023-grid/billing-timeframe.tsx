@@ -4,16 +4,18 @@ import {
 	PlanSlug,
 	getPlanSlugForTermVariant,
 	TERM_ANNUALLY,
-	TERM_BIENNIALLY,
-	planMatches,
-	TERM_TRIENNIALLY,
 } from '@automattic/calypso-products';
+import { Plans } from '@automattic/data-stores';
 import { formatCurrency } from '@automattic/format-currency';
+import { useLocale } from '@automattic/i18n-utils';
+import { useSelect } from '@wordpress/data';
 import { localize, TranslateResult, useTranslate } from 'i18n-calypso';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import usePlanPrices from 'calypso/my-sites/plans/hooks/use-plan-prices';
 import { getCurrentUserCurrencyCode } from 'calypso/state/currency-code/selectors';
+import { PLANS_STORE } from './store';
+import type { PlansSelect } from '@automattic/data-stores';
 
 interface Props {
 	planName: string;
@@ -38,8 +40,14 @@ function usePerMonthDescription( { isMonthlyPlan, planName }: Omit< Props, 'bill
 	// we want the raw price (discounted or not) for the yearly variant, not the site-plan discounted one
 	const yearlyVariantMaybeDiscountedPrice =
 		planYearlyVariantPrices.discountedRawPrice || planYearlyVariantPrices.rawPrice;
+	const locale = useLocale();
+	const plan = useSelect(
+		( select ) =>
+			( select( PLANS_STORE ) as PlansSelect ).getPlanProductByStoreSlug( planName, locale ),
+		[ planName ]
+	);
 
-	if ( isWpComFreePlan( planName ) || isWpcomEnterpriseGridPlan( planName ) ) {
+	if ( ! plan || isWpComFreePlan( planName ) || isWpcomEnterpriseGridPlan( planName ) ) {
 		return null;
 	}
 
@@ -62,19 +70,19 @@ function usePerMonthDescription( { isMonthlyPlan, planName }: Omit< Props, 'bill
 				? formatCurrency( maybeDiscountedPrice, currencyCode )
 				: null;
 
-		if ( planMatches( planName, { term: TERM_ANNUALLY } ) ) {
+		if ( Plans.TERM_ANNUALLY === plan?.term ) {
 			return translate( 'per month, %(fullTermPriceText)s billed annually', {
 				args: { fullTermPriceText },
 			} );
 		}
 
-		if ( planMatches( planName, { term: TERM_BIENNIALLY } ) ) {
+		if ( Plans.TERM_BIENNIALLY === plan?.term ) {
 			return translate( 'per month, %(fullTermPriceText)s billed every two years', {
 				args: { fullTermPriceText },
 			} );
 		}
 
-		if ( planMatches( planName, { term: TERM_TRIENNIALLY } ) ) {
+		if ( Plans.TERM_TRIENNIALLY === plan?.term ) {
 			return translate( 'per month, %(fullTermPriceText)s billed every three years', {
 				args: { fullTermPriceText },
 			} );
