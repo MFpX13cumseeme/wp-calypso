@@ -9,6 +9,7 @@ import {
 	isPersonalPlan,
 	isPremiumPlan,
 	isBusinessPlan,
+	isWpcomEnterpriseGridPlan,
 	isEcommercePlan,
 	isProPlan,
 	isStarterPlan,
@@ -31,7 +32,7 @@ import {
 	is2023PricingGridActivePage,
 } from '@automattic/calypso-products';
 import { Button } from '@automattic/components';
-import { isNewsletterOrLinkInBioFlow } from '@automattic/onboarding';
+import { isLinkInBioFlow, isNewsletterFlow } from '@automattic/onboarding';
 import { hasTranslation } from '@wordpress/i18n';
 import warn from '@wordpress/warning';
 import classNames from 'classnames';
@@ -410,7 +411,11 @@ export class PlansFeaturesMain extends Component {
 			plans = plans.filter( ( planSlug ) => ! isEcommercePlan( planSlug ) );
 		}
 
-		if ( isNewsletterOrLinkInBioFlow( flowName ) ) {
+		if ( isNewsletterFlow( flowName ) ) {
+			plans = plans.filter(
+				( planSlug ) => ! isWpcomEnterpriseGridPlan( planSlug ) && ! isEcommercePlan( planSlug )
+			);
+		} else if ( isLinkInBioFlow( flowName ) ) {
 			plans = plans.filter(
 				( planSlug ) => ! isBusinessPlan( planSlug ) && ! isEcommercePlan( planSlug )
 			);
