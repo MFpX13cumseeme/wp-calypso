@@ -22,6 +22,7 @@ import {
 	PlanSlug,
 } from '@automattic/calypso-products';
 import formatCurrency from '@automattic/format-currency';
+import { NEWSLETTER_FLOW } from '@automattic/onboarding';
 import { MinimalRequestCartProduct } from '@automattic/shopping-cart';
 import { Button } from '@wordpress/components';
 import classNames from 'classnames';
@@ -1008,7 +1009,8 @@ const withIsLargeCurrency = ( Component: LocalizedComponent< typeof PlanFeatures
 /* eslint-disable wpcalypso/redux-no-bound-selectors */
 const ConnectedPlanFeatures2023Grid = connect(
 	( state: IAppState, ownProps: PlanFeatures2023GridProps ) => {
-		const { placeholder, plans, isLandingPage, visiblePlans, isInSignup, siteId } = ownProps;
+		const { placeholder, plans, isLandingPage, visiblePlans, isInSignup, siteId, flowName } =
+			ownProps;
 		const canUserPurchasePlan =
 			! isCurrentPlanPaid( state, siteId ) || isCurrentUserCurrentPlanOwner( state, siteId );
 		const purchaseId = getCurrentPlanPurchaseId( state, siteId );
@@ -1037,12 +1039,22 @@ const ConnectedPlanFeatures2023Grid = connect(
 				isPlaceholder = true;
 			}
 
-			const planFeatures = getPlanFeaturesObject(
-				planConstantObj?.get2023PricingGridSignupWpcomFeatures?.() ?? []
-			);
-			const jetpackFeatures = getPlanFeaturesObject(
-				planConstantObj.get2023PricingGridSignupJetpackFeatures?.() ?? []
-			);
+			let planFeatures = [];
+			let jetpackFeatures = [];
+
+			if ( flowName === NEWSLETTER_FLOW ) {
+				planFeatures = getPlanFeaturesObject(
+					planConstantObj?.getNewsletterSignupFeatures?.() ?? []
+				);
+			} else {
+				planFeatures = getPlanFeaturesObject(
+					planConstantObj?.get2023PricingGridSignupWpcomFeatures?.() ?? []
+				);
+
+				jetpackFeatures = getPlanFeaturesObject(
+					planConstantObj.get2023PricingGridSignupJetpackFeatures?.() ?? []
+				);
+			}
 
 			const rawPrice = getPlanRawPrice( state, planProductId, showMonthlyPrice );
 
