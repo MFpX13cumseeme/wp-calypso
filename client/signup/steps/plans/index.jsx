@@ -371,7 +371,11 @@ export const isDotBlogDomainRegistration = ( domainItem ) => {
 const ConnectedPlansStep = connect(
 	(
 		state,
-		{ path, signupDependencies: { siteSlug, domainItem, plans_reorder_abtest_variation } }
+		{
+			path,
+			signupDependencies: { siteSlug, domainItem, plans_reorder_abtest_variation },
+			datastorePlansLoading,
+		}
 	) => ( {
 		// Blogger plan is only available if user chose either a free domain or a .blog domain registration
 		disableBloggerPlanWithNonBlogDomain:
@@ -390,20 +394,23 @@ const ConnectedPlansStep = connect(
 		// in https://github.com/Automattic/wp-calypso/issues/50896, till a proper cleanup and deploy of
 		// treatment for the `vertical_plan_listing_v2` experiment is implemented.
 		isInVerticalScrollingPlansExperiment: true,
-		plansLoaded: Boolean( getPlanSlug( state, getPlan( PLAN_FREE )?.getProductId() || 0 ) ),
+		plansLoaded:
+			Boolean( getPlanSlug( state, getPlan( PLAN_FREE )?.getProductId() || 0 ) ) &&
+			! datastorePlansLoading,
 		eligibleForProPlan: isEligibleForProPlan( state, getSiteBySlug( state, siteSlug )?.ID ),
 		is2023PricingGridVisible: is2023PricingGridActivePage( window ),
 	} ),
 	{ recordTracksEvent, saveSignupStep, submitSignupStep, errorNotice }
 )( localize( PlansStep ) );
 
-// This is a temporary workaround to force the data-store to fetch the plans data
-// before the component is rendered. It should be removed once plans are retrieved
-// via a data-store selector.
 export default withSelect( ( select, ownProps ) => {
 	const locale = getLocaleSlug();
-
+	// This is a temporary workaround to force the data-store to fetch the plans data.
+	// It should be updated once plans are retrieved via a data-store selector.
 	select( PLANS_STORE ).getSupportedPlans( locale );
+	const datastorePlansLoading = select( PLANS_STORE ).isResolving( 'getSupportedPlans', [
+		locale,
+	] );
 
-	return ownProps;
+	return { ...ownProps, datastorePlansLoading };
 } )( ConnectedPlansStep );

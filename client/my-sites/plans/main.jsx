@@ -27,6 +27,7 @@ import QueryPlans from 'calypso/components/data/query-plans';
 import QuerySitePurchases from 'calypso/components/data/query-site-purchases';
 import EmptyContent from 'calypso/components/empty-content';
 import FormattedHeader from 'calypso/components/formatted-header';
+import { LoadingEllipsis } from 'calypso/components/loading-ellipsis';
 import Main from 'calypso/components/main';
 import PageViewTracker from 'calypso/lib/analytics/page-view-tracker';
 import TrackComponentView from 'calypso/lib/analytics/track-component-view';
@@ -242,8 +243,7 @@ class Plans extends Component {
 		} = this.props;
 
 		if ( ! this.props.plansLoaded || ! currentPlan ) {
-			// Maybe we should show a loading indicator here?
-			return null;
+			return this.renderLoading();
 		}
 
 		if ( isEnabled( 'p2/p2-plus' ) && isWPForTeamsSite ) {
@@ -333,6 +333,14 @@ class Plans extends Component {
 			return this.renderWooExpressPlansPage();
 		}
 		return this.renderPlansMain();
+	}
+
+	renderLoading() {
+		return (
+			<div className="plans__loading-ellipsis">
+				<LoadingEllipsis active />
+			</div>
+		);
 	}
 
 	render() {
@@ -461,7 +469,9 @@ const ConnectedPlans = connect( ( state, props ) => {
 		isWPForTeamsSite: isSiteWPForTeams( state, selectedSiteId ),
 		isSiteEligibleForMonthlyPlan: isEligibleForWpComMonthlyPlan( state, selectedSiteId ),
 		showTreatmentPlansReorderTest: isTreatmentPlansReorderTest( state ),
-		plansLoaded: Boolean( getPlanSlug( state, getPlan( PLAN_FREE )?.getProductId() || 0 ) ),
+		plansLoaded:
+			Boolean( getPlanSlug( state, getPlan( PLAN_FREE )?.getProductId() || 0 ) ) &&
+			! props.datastorePlansLoading,
 		is2023PricingGridVisible:
 			props.is2023PricingGridVisible ?? is2023PricingGridActivePage( window ),
 		isDomainAndPlanPackageFlow: !! getCurrentQueryArguments( state )?.domainAndPlanPackage,
@@ -482,13 +492,14 @@ function PlansWrapper( props ) {
 	);
 }
 
-// This is a temporary workaround to force the data-store to fetch the plans data
-// before the component is rendered. It should be removed once plans are retrieved
-// via a data-store selector.
 export default withSelect( ( select, ownProps ) => {
 	const locale = getLocaleSlug();
-
+	// This is a temporary workaround to force the data-store to fetch the plans data.
+	// It should be updated once plans are retrieved via a data-store selector.
 	select( PLANS_STORE ).getSupportedPlans( locale );
+	const datastorePlansLoading = select( PLANS_STORE ).isResolving( 'getSupportedPlans', [
+		locale,
+	] );
 
-	return ownProps;
+	return { ...ownProps, datastorePlansLoading };
 } )( PlansWrapper );
