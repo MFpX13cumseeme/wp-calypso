@@ -3,7 +3,6 @@ import {
 	isWpcomEnterpriseGridPlan,
 	PlanSlug,
 	getPlanSlugForTermVariant,
-	TERM_ANNUALLY,
 } from '@automattic/calypso-products';
 import { Plans } from '@automattic/data-stores';
 import { formatCurrency } from '@automattic/format-currency';
@@ -32,7 +31,7 @@ function usePerMonthDescription( { isMonthlyPlan, planName }: Omit< Props, 'bill
 	} );
 	const planYearlyVariantPrices = usePlanPrices( {
 		planSlug:
-			getPlanSlugForTermVariant( planName as PlanSlug, TERM_ANNUALLY ) ?? ( '' as PlanSlug ),
+			getPlanSlugForTermVariant( planName as PlanSlug, Plans.TERM_ANNUALLY ) ?? ( '' as PlanSlug ),
 		returnMonthly: true,
 	} );
 	const maybeDiscountedPrice =
