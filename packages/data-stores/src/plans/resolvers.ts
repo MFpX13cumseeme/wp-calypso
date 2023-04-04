@@ -142,7 +142,7 @@ function normalizePlanProducts(
 			( plan ) => plan.productIds.indexOf( planProduct.product_id ) > -1
 		) as Plan;
 
-		let term: typeof TERMS_LIST[ number ] = TERM_MONTHLY;
+		let term: ( typeof TERMS_LIST )[ number ] = TERM_MONTHLY;
 		switch ( planProduct.bill_period ) {
 			case PLAN_ANNUAL_PERIOD:
 				term = TERM_ANNUALLY;
