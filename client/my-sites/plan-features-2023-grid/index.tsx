@@ -57,7 +57,7 @@ import Notice from 'calypso/components/notice';
 import { retargetViewPlans } from 'calypso/lib/analytics/ad-tracking';
 import { planItem as getCartItemForPlan } from 'calypso/lib/cart-values/cart-items';
 import { getDiscountByName } from 'calypso/lib/discounts';
-import { getPlanFeaturesObject } from 'calypso/lib/plans/features-list';
+import { FeatureObject, getPlanFeaturesObject } from 'calypso/lib/plans/features-list';
 import scrollIntoViewport from 'calypso/lib/scroll-into-viewport';
 import { calculatePlanCredits } from 'calypso/my-sites/plan-features';
 import { PlanTypeSelectorProps } from 'calypso/my-sites/plans-features-main/plan-type-selector';
@@ -1043,12 +1043,15 @@ const ConnectedPlanFeatures2023Grid = connect(
 			}
 
 			let planFeatures = [];
-			let jetpackFeatures = [];
+			let jetpackFeatures: FeatureObject[] = [];
+			let tagline = planConstantObj.getPlanTagline?.() ?? '';
 
 			if ( flowName === NEWSLETTER_FLOW ) {
 				planFeatures = getPlanFeaturesObject(
 					planConstantObj?.getNewsletterSignupFeatures?.() ?? []
 				);
+
+				tagline = planConstantObj.getCustomTagline?.( NEWSLETTER_FLOW ) ?? '';
 			} else {
 				planFeatures = getPlanFeaturesObject(
 					planConstantObj?.get2023PricingGridSignupWpcomFeatures?.() ?? []
@@ -1101,7 +1104,6 @@ const ConnectedPlanFeatures2023Grid = connect(
 				);
 			}
 
-			const tagline = planConstantObj.getPlanTagline?.() ?? '';
 			const product_name_short =
 				isWpcomEnterpriseGridPlan( plan ) && planConstantObj.getPathSlug
 					? planConstantObj.getPathSlug()
