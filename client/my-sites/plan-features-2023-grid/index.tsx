@@ -28,6 +28,7 @@ import {
 	isWooExpressSmallPlan,
 	isWooExpressPlan,
 } from '@automattic/calypso-products';
+import NoticeBanner from '@automattic/components/src/notice-banner';
 import formatCurrency from '@automattic/format-currency';
 import { MinimalRequestCartProduct } from '@automattic/shopping-cart';
 import { Button } from '@wordpress/components';
@@ -973,7 +974,11 @@ export class PlanFeatures2023Grid extends Component<
 				showDismiss={ true }
 				onDismissClick={ this.handleDismissNotice }
 				icon="info-outline"
-				status="is-success"
+				status="is-info"
+				isReskinned={ true }
+				// level="info"
+				// onClose={ this.handleDismissNotice }
+				// title=""
 			>
 				{ translate(
 					'You have {{b}}%(amountInCurrency)s{{/b}} of pro-rated credits available from your current plan. ' +
