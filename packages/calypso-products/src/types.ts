@@ -35,7 +35,7 @@ export interface WPComPlan extends Plan {
 	getBlogAudience?: () => TranslateResult;
 	getPortfolioAudience?: () => TranslateResult;
 	getStoreAudience?: () => TranslateResult;
-	getPlanTagline?: () => string;
+	getPlanTagline?: ( flowName?: string ) => string;
 	getSubTitle?: () => TranslateResult;
 	getPlanCompareFeatures?: (
 		experiment?: string,
@@ -44,7 +44,6 @@ export interface WPComPlan extends Plan {
 	getSignupFeatures?: () => Feature[];
 	getBlogSignupFeatures?: () => Feature[];
 	getPortfolioSignupFeatures?: () => Feature[];
-	getCustomTagline?: ( flowName: string ) => string;
 	getNewsletterDescription?: () => string;
 	getNewsletterSignupFeatures?: () => Feature[];
 	getNewsletterHighlightedFeatures?: () => Feature[];
