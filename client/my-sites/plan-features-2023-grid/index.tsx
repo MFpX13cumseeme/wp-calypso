@@ -20,6 +20,7 @@ import {
 	isWooExpressSmallPlan,
 	isWooExpressPlan,
 	PlanSlug,
+	PLAN_PERSONAL,
 } from '@automattic/calypso-products';
 import formatCurrency from '@automattic/format-currency';
 import { MinimalRequestCartProduct } from '@automattic/shopping-cart';
@@ -86,6 +87,7 @@ import PlanFeatures2023GridActions from './actions';
 import PlanFeatures2023GridBillingTimeframe from './billing-timeframe';
 import PopularBadge from './components/popular-badge';
 import PlanFeatures2023GridFeatures from './features';
+import { FreePlanPaidDomainDialog } from './free-plan-paid-domain-dialog';
 import PlanFeatures2023GridHeaderPrice from './header-price';
 import useHighlightAdjacencyMatrix from './hooks/use-highlight-adjacency-matrix';
 import useHighlightLabel from './hooks/use-highlight-label';
@@ -94,6 +96,7 @@ import { PlanComparisonGrid } from './plan-comparison-grid';
 import { Plans2023Tooltip } from './plans-2023-tooltip';
 import { PlanProperties, TransformedFeatureObject } from './types';
 import { getStorageStringFromFeature } from './util';
+import type { DomainSuggestion } from '@automattic/data-stores';
 import type { IAppState } from 'calypso/state/types';
 import './style.scss';
 
@@ -135,6 +138,7 @@ type PlanFeatures2023GridProps = {
 	withDiscount: boolean;
 	discountEndDate: Date;
 	hidePlansFeatureComparison: boolean;
+	replacePaidDomainWithFreeDomain: ( freeDomainSuggestion: DomainSuggestion ) => void;
 };
 
 type PlanFeatures2023GridConnectedProps = {
@@ -158,6 +162,7 @@ type PlanFeatures2023GridType = PlanFeatures2023GridProps &
 
 type PlanFeatures2023GridState = {
 	showPlansComparisonGrid: boolean;
+	isFreePlanPaidDomainDialogOpen: boolean;
 	noticeDismissed: boolean;
 };
 
@@ -254,6 +259,7 @@ export class PlanFeatures2023Grid extends Component<
 > {
 	state = {
 		showPlansComparisonGrid: false,
+		isFreePlanPaidDomainDialogOpen: false,
 		noticeDismissed: false,
 	};
 
@@ -271,6 +277,12 @@ export class PlanFeatures2023Grid extends Component<
 	toggleShowPlansComparisonGrid = () => {
 		this.setState( ( { showPlansComparisonGrid } ) => ( {
 			showPlansComparisonGrid: ! showPlansComparisonGrid,
+		} ) );
+	};
+
+	toggleIsFreePlanPaidDomainDialogOpen = () => {
+		this.setState( ( { isFreePlanPaidDomainDialogOpen } ) => ( {
+			isFreePlanPaidDomainDialogOpen: ! isFreePlanPaidDomainDialogOpen,
 		} ) );
 	};
 
@@ -304,11 +316,32 @@ export class PlanFeatures2023Grid extends Component<
 			translate,
 			selectedSiteSlug,
 			hidePlansFeatureComparison,
+			domainName,
+			onUpgradeClick,
+			replacePaidDomainWithFreeDomain,
 		} = this.props;
 		return (
 			<div className="plans-wrapper">
 				<QueryActivePromotions />
 				{ this.renderNotice() }
+				{ this.state.isFreePlanPaidDomainDialogOpen && (
+					<FreePlanPaidDomainDialog
+						domainName={ domainName }
+						planSlug={ PLAN_PERSONAL }
+						onClose={ this.toggleIsFreePlanPaidDomainDialogOpen }
+						onFreePlanSelected={ ( freeDomainSuggestion ) => {
+							replacePaidDomainWithFreeDomain( freeDomainSuggestion );
+							onUpgradeClick( null );
+						} }
+						onPlanSelected={ () =>
+							this.handleUpgradeClick(
+								planProperties.find(
+									( { planName } ) => planName === PLAN_PERSONAL
+								) as PlanProperties
+							)
+						}
+					/>
+				) }
 				<div className="plan-features">
 					<div className="plan-features-2023-grid__content">
 						<div>
@@ -610,11 +643,16 @@ export class PlanFeatures2023Grid extends Component<
 	}
 
 	handleUpgradeClick = ( singlePlanProperties: PlanProperties ) => {
-		const { onUpgradeClick: ownPropsOnUpgradeClick, selectedSiteSlug } = this.props;
+		const { onUpgradeClick: ownPropsOnUpgradeClick, selectedSiteSlug, domainName } = this.props;
 		const { cartItemForPlan, planName } = singlePlanProperties;
 
 		if ( ownPropsOnUpgradeClick && cartItemForPlan ) {
 			ownPropsOnUpgradeClick( cartItemForPlan );
+			return;
+		}
+
+		if ( isFreePlan( planName ) && domainName ) {
+			this.toggleIsFreePlanPaidDomainDialogOpen();
 			return;
 		}
 
