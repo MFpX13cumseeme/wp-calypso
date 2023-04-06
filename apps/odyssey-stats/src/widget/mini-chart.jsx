@@ -6,6 +6,7 @@ import Chart from 'calypso/components/chart';
 import Legend from 'calypso/components/chart/legend';
 import { buildChartData } from 'calypso/my-sites/stats/stats-chart-tabs/utility';
 import StatsModulePlaceholder from 'calypso/my-sites/stats/stats-module/placeholder';
+import useTopPostsQuery from '../hooks/use-top-posts-query';
 import useVisitsQuery from '../hooks/use-visits-query';
 
 import './mini-chart.scss';
@@ -30,6 +31,10 @@ const MiniChart = ( { siteId, quantity = 7, gmtOffset, odysseyStatsBaseUrl } ) =
 	const [ period, setPeriod ] = useState( 'day' );
 
 	const { isLoading, data } = useVisitsQuery( siteId, period, quantity, queryDate );
+
+	const { data: topPosts } = useTopPostsQuery( siteId, 'day', 7, '2023-04-01' );
+
+	console.log( 'topPosts', topPosts );
 
 	const barClick = ( bar ) => {
 		window.location.href = `${ odysseyStatsBaseUrl }#!/stats/${ period }/${ siteId }?startDate=${ bar.data.period }`;
