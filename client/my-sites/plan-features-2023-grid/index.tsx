@@ -22,6 +22,7 @@ import {
 	isWooExpressMediumPlan,
 	isWooExpressPlan,
 	PlanSlug,
+	isWooExpressPlusPlan,
 } from '@automattic/calypso-products';
 import formatCurrency from '@automattic/format-currency';
 import { MinimalRequestCartProduct } from '@automattic/shopping-cart';
@@ -692,7 +693,7 @@ export class PlanFeatures2023Grid extends Component<
 							className={ getPlanClass( planName ) }
 							freePlan={ isFreePlan( planName ) }
 							isWpcomEnterpriseGridPlan={ isWpcomEnterpriseGridPlan( planName ) }
-							isWooExpressPlusPlan={ planName === PLAN_WOOEXPRESS_PLUS }
+							isWooExpressPlusPlan={ isWooExpressPlusPlan( planName ) }
 							isPlaceholder={ isPlaceholder ?? false }
 							isInSignup={ isInSignup }
 							isLaunchPage={ isLaunchPage }
