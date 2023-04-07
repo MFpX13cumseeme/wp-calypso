@@ -2347,8 +2347,7 @@ export const PLANS_LIST: Record< string, Plan | JetpackPlan | WPComPlan > = {
 		getPathSlug: () => 'wooexpress-small-yearly',
 	},
 
-	// Not a real plan. This is used to show the Plus offering in
-	// the main plans grid
+	// Not a real plan. This is used to show the Plus offering in the Woo Express plans grid
 	[ PLAN_WOOEXPRESS_PLUS ]: {
 		...getPlanWooExpressPlusDetails(),
 		term: TERM_ANNUALLY,
