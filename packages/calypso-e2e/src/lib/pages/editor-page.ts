@@ -646,23 +646,18 @@ export class EditorPage {
 
 		// Resolve the promises.
 		const [ response ] = await Promise.all( [
-			// First URL matches Atomic requests while the second matches Simple requests.
-			Promise.race( [
-				this.page.waitForResponse( /v2\/(posts|pages)\/[\d]+/ ),
-				this.page.waitForResponse( /.*v2\/sites\/[\d]+\/(posts|pages)\/[\d]+.*/ ),
-			] ),
+			this.page.waitForResponse(
+				/(v2\/(posts|pages)\/[\d]+|v2\/sites\/[\d]+\/(posts|pages)\/[\d]+)/
+			),
 			...actionsArray,
 		] );
 
 		const json = await response.json();
 
 		// AT and Simple sites have slightly differing response from the API.
-		let publishedURL: string;
-		if ( json.link ) {
-			publishedURL = json.link;
-		} else if ( json.body.link ) {
-			publishedURL = json.body.link;
-		} else {
+		const publishedURL = json.link !== undefined ? json.link : json.body?.link;
+
+		if ( publishedURL === undefined ) {
 			throw new Error( 'No published article URL found in response.' );
 		}
 

@@ -72,12 +72,13 @@ export class EditorSidebarBlockInserterComponent {
 		let locator;
 
 		if ( type === 'pattern' ) {
-			locator = this.editor.locator( selectors.patternResultItem( name ) ).first();
+			locator = this.editor.getByLabel( 'Block Patterns' ).getByText( name ).first();
 		} else {
-			locator = this.editor.locator( selectors.blockResultItem( name ) ).first();
+			locator = this.editor.getByLabel( 'Blocks' ).getByText( name ).first();
 		}
 
-		await Promise.all( [ locator.hover(), locator.focus() ] );
-		await locator.click();
+		// Force dispatch the click event.
+		// Patterns and Block loading in the sidebar can be very slow.
+		await locator.dispatchEvent( 'click' );
 	}
 }
