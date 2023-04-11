@@ -60,7 +60,6 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 
 	describe( 'Publish post', function () {
 		it( 'Enter post title', async function () {
-			editorURL = new URL( page.url() );
 			await editorPage.enterTitle( postTitle );
 		} );
 
@@ -76,6 +75,7 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 
 		it( 'Publish post', async function () {
 			postURL = await editorPage.publish();
+			editorURL = new URL( page.url() );
 		} );
 
 		/**
