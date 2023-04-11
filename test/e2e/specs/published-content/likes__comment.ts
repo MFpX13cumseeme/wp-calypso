@@ -78,7 +78,10 @@ describe( 'Likes: Comment', function () {
 			);
 
 			async function closure( page: Page ) {
-				await page.getByText( 'Loading...' ).last().waitFor( { state: 'hidden' } );
+				await page
+					.getByText( 'Loading...' )
+					.last()
+					.waitFor( { state: 'hidden', timeout: 20 * 1000 } );
 			}
 			await ElementHelper.reloadAndRetry( page, closure );
 		} );
@@ -101,7 +104,10 @@ describe( 'Likes: Comment', function () {
 			);
 
 			async function closure( page: Page ) {
-				await page.getByText( 'Loading...' ).last().waitFor( { state: 'hidden' } );
+				await page
+					.getByText( 'Loading...' )
+					.last()
+					.waitFor( { state: 'hidden', timeout: 20 * 1000 } );
 			}
 			await ElementHelper.reloadAndRetry( page, closure );
 		} );
