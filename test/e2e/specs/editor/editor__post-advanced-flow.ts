@@ -41,6 +41,7 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 	let postsPage: PostsPage;
 	let paragraphBlock: ParagraphBlock;
 	let postURL: URL;
+	let editorURL: URL;
 
 	beforeAll( async function () {
 		page = await browser.newPage();
@@ -59,6 +60,7 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 
 	describe( 'Publish post', function () {
 		it( 'Enter post title', async function () {
+			editorURL = new URL( page.url() );
 			await editorPage.enterTitle( postTitle );
 		} );
 
@@ -97,11 +99,7 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 	describe( 'Edit published post', function () {
 		beforeAll( async function () {
 			// See: https://github.com/Automattic/wp-calypso/issues/74925
-			await page.goBack( { timeout: timeout } );
-		} );
-
-		it( 'Editor is shown', async function () {
-			await editorPage.waitUntilLoaded();
+			await page.goto( editorURL.href, { timeout: timeout } );
 		} );
 
 		it( 'Append additional content', async function () {
@@ -132,7 +130,7 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 	describe( 'Revert post to draft', function () {
 		beforeAll( async function () {
 			// See: https://github.com/Automattic/wp-calypso/issues/74925
-			await page.goBack( { timeout: timeout } );
+			await page.goto( editorURL.href, { timeout: timeout } );
 		} );
 
 		it( 'Switch to draft', async function () {
