@@ -14,10 +14,17 @@ import {
 	getTestAccountByFeature,
 	envToFeatureKey,
 	ElementHelper,
+	EXTENDED_EDITOR_WAIT_ATOMIC_TIMEOUT,
+	EXTENDED_EDITOR_WAIT_TIMEOUT,
 } from '@automattic/calypso-e2e';
 import { Browser, Page } from 'playwright';
 
 declare const browser: Browser;
+// Used for loading waiting on the editor by navigating back from the published page.
+const timeout =
+	envVariables.TEST_ON_ATOMIC === true
+		? EXTENDED_EDITOR_WAIT_ATOMIC_TIMEOUT
+		: EXTENDED_EDITOR_WAIT_TIMEOUT;
 
 describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function () {
 	const features = envToFeatureKey( envVariables );
@@ -88,9 +95,9 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 	} );
 
 	describe( 'Edit published post', function () {
-		beforeAll( async () => {
+		beforeAll( async function () {
 			// See: https://github.com/Automattic/wp-calypso/issues/74925
-			await page.goBack();
+			await page.goBack( { timeout: timeout } );
 		} );
 
 		it( 'Editor is shown', async function () {
@@ -119,11 +126,15 @@ describe( DataHelper.createSuiteTitle( `Editor: Advanced Post Flow` ), function 
 		it( 'Ensure published post contains additional content', async function () {
 			await page.goto( postURL.href );
 			await ParagraphBlock.validatePublishedContent( page, [ originalContent, additionalContent ] );
-			await page.goBack();
 		} );
 	} );
 
 	describe( 'Revert post to draft', function () {
+		beforeAll( async function () {
+			// See: https://github.com/Automattic/wp-calypso/issues/74925
+			await page.goBack( { timeout: timeout } );
+		} );
+
 		it( 'Switch to draft', async function () {
 			await editorPage.unpublish();
 		} );
