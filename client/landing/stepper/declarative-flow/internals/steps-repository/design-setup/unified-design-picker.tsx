@@ -110,7 +110,7 @@ const UnifiedDesignPickerStep: Step = ( { navigation, flow } ) => {
 	);
 
 	// ********** Logic for vertical
-	const { data: siteVertical, isLoading: isLoadingSiteVertical } =
+	const { data: siteVertical, isInitialLoading: isLoadingSiteVertical } =
 		useSiteVerticalQueryById( siteVerticalId );
 
 	// ********** Logic for fetching designs
